@@ -1,11 +1,40 @@
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ThumbsUp, Beaker, CheckCircle2, Clock, TrendingUp, Users } from "lucide-react";
+import { ThumbsUp, Beaker, CheckCircle2, Clock, TrendingUp, Users, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Laboratory() {
+    // Tab Persistence
+    const [activeTab, setActiveTab] = useState(() => {
+        return localStorage.getItem("laboratory_active_tab") || "ideas";
+    });
+
+    useEffect(() => {
+        localStorage.setItem("laboratory_active_tab", activeTab);
+    }, [activeTab]);
+
+    // Action Persistence (Supported Projects)
+    const [supportedProjects, setSupportedProjects] = useState<string[]>(() => {
+        const saved = localStorage.getItem("laboratory_supported_projects");
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    useEffect(() => {
+        localStorage.setItem("laboratory_supported_projects", JSON.stringify(supportedProjects));
+    }, [supportedProjects]);
+
+    const toggleSupport = (id: string) => {
+        setSupportedProjects(prev =>
+            prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+        );
+    };
+
+    const isSupported = (id: string) => supportedProjects.includes(id);
+
     return (
         <div className="container py-12 space-y-16">
             <div className="text-center space-y-4">
@@ -15,175 +44,198 @@ export default function Laboratory() {
                 </p>
             </div>
 
-            <Tabs defaultValue="ideas" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-8">
-                    <TabsTrigger value="ideas">Идеи на рассмотрении</TabsTrigger>
-                    <TabsTrigger value="testing">Технологии в тесте</TabsTrigger>
-                    <TabsTrigger value="proven">Проверенные решения</TabsTrigger>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+                <TabsList className="grid w-full grid-cols-3 mb-8 h-auto p-1 bg-muted/50 rounded-xl">
+                    {["ideas", "testing", "proven"].map((tab) => (
+                        <TabsTrigger
+                            key={tab}
+                            value={tab}
+                            className="py-3 text-base data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm transition-all duration-300 rounded-lg"
+                        >
+                            {tab === "ideas" && "Идеи на рассмотрении"}
+                            {tab === "testing" && "Технологии в тесте"}
+                            {tab === "proven" && "Проверенные решения"}
+                        </TabsTrigger>
+                    ))}
                 </TabsList>
 
-                {/* Zone A: Ideas */}
-                <TabsContent value="ideas" className="space-y-8">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h2 className="text-2xl font-bold">Идеи на рассмотрении</h2>
-                            <p className="text-muted-foreground">Голосуйте за технологии, которые хотите увидеть на полях.</p>
+                <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                    {/* Zone A: Ideas */}
+                    <TabsContent value="ideas" className="space-y-8 mt-0">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h2 className="text-2xl font-bold">Идеи на рассмотрении</h2>
+                                <p className="text-muted-foreground">Голосуйте за технологии, которые хотите увидеть на полях.</p>
+                            </div>
+                            <Button>Предложить идею</Button>
                         </div>
-                        <Button>Предложить идею</Button>
-                    </div>
 
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        <Card>
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <Card className={cn("transition-all duration-300", isSupported("bio-sensor") ? "border-primary ring-1 ring-primary shadow-md" : "")}>
+                                <CardHeader>
+                                    <div className="flex justify-between items-start">
+                                        <Badge variant="secondary">На голосовании</Badge>
+                                        <div className="flex items-center text-sm text-muted-foreground">
+                                            <Clock className="w-4 h-4 mr-1" /> 12 дней
+                                        </div>
+                                    </div>
+                                    <CardTitle className="mt-4">Биосенсор болезней растений</CardTitle>
+                                    <CardDescription>Автор: Бекжан Алиев, студент КРСУ</CardDescription>
+                                </CardHeader>
+                                <CardContent className="space-y-4">
+                                    <p className="text-sm">Определяет болезни за 3 дня до видимых симптомов с помощью ИК-спектроскопии.</p>
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between text-sm">
+                                            <span>Собрано голосов</span>
+                                            <span className="font-bold">{247 + (isSupported("bio-sensor") ? 1 : 0)}</span>
+                                        </div>
+                                        <Progress value={65} className="h-2" />
+                                    </div>
+                                    <div className="text-sm text-muted-foreground">
+                                        <p>Нужно для теста: $2,000</p>
+                                    </div>
+                                </CardContent>
+                                <CardFooter className="flex flex-col gap-2">
+                                    <Button className="w-full" variant="outline">Читать подробнее</Button>
+                                    <Button
+                                        className={cn("w-full transition-colors", isSupported("bio-sensor") ? "bg-green-600 hover:bg-green-700" : "")}
+                                        onClick={() => toggleSupport("bio-sensor")}
+                                    >
+                                        {isSupported("bio-sensor") ? (
+                                            <>
+                                                <Check className="w-4 h-4 mr-2" /> Вы поддержали
+                                            </>
+                                        ) : (
+                                            <>
+                                                <ThumbsUp className="w-4 h-4 mr-2" /> Поддержать проект
+                                            </>
+                                        )}
+                                    </Button>
+                                </CardFooter>
+                            </Card>
+                            {/* Placeholder for more cards */}
+                            <Card className="opacity-60 border-dashed hover:opacity-100 transition-opacity cursor-pointer">
+                                <CardContent className="flex flex-col items-center justify-center h-full min-h-[300px] text-center p-6">
+                                    <div className="bg-muted p-4 rounded-full mb-4">
+                                        <Beaker className="w-8 h-8 text-muted-foreground" />
+                                    </div>
+                                    <h3 className="font-semibold mb-2">Ваша идея здесь</h3>
+                                    <p className="text-sm text-muted-foreground mb-4">Предложите технологию и получите грант на тестирование</p>
+                                    <Button variant="outline">Подать заявку</Button>
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </TabsContent>
+
+                    {/* Zone B: Testing */}
+                    <TabsContent value="testing" className="space-y-8 mt-0">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h2 className="text-2xl font-bold">Технологии в тесте</h2>
+                                <p className="text-muted-foreground">Следите за реальными испытаниями в режиме реального времени.</p>
+                            </div>
+                            <Button variant="outline">Смотреть live-трансляции</Button>
+                        </div>
+
+                        <Card className="border-primary/20 bg-primary/5">
                             <CardHeader>
                                 <div className="flex justify-between items-start">
-                                    <Badge variant="secondary">На голосовании</Badge>
-                                    <div className="flex items-center text-sm text-muted-foreground">
-                                        <Clock className="w-4 h-4 mr-1" /> 12 дней
+                                    <div className="flex items-center gap-2">
+                                        <Badge className="bg-green-500 hover:bg-green-600">Активный тест</Badge>
+                                        <span className="text-sm text-muted-foreground">Поле #7, Чуйская область</span>
                                     </div>
+                                    <Button variant="ghost" size="sm">Подписаться</Button>
                                 </div>
-                                <CardTitle className="mt-4">Биосенсор болезней растений</CardTitle>
-                                <CardDescription>Автор: Бекжан Алиев, студент КРСУ</CardDescription>
+                                <CardTitle className="mt-2 text-2xl">AI-прогноз заморозков за 48 часов</CardTitle>
                             </CardHeader>
-                            <CardContent className="space-y-4">
-                                <p className="text-sm">Определяет болезни за 3 дня до видимых симптомов с помощью ИК-спектроскопии.</p>
-                                <div className="space-y-2">
-                                    <div className="flex justify-between text-sm">
-                                        <span>Собрано голосов</span>
-                                        <span className="font-bold">247</span>
+                            <CardContent className="grid md:grid-cols-3 gap-8">
+                                <div className="space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground">Старт теста</span>
+                                        <span className="font-medium">15 марта 2026</span>
                                     </div>
-                                    <Progress value={65} />
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-muted-foreground">До завершения</span>
+                                        <span className="font-medium">47 дней</span>
+                                    </div>
+                                    <Progress value={45} className="h-2" />
                                 </div>
-                                <div className="text-sm text-muted-foreground">
-                                    <p>Нужно для теста: $2,000</p>
-                                </div>
-                            </CardContent>
-                            <CardFooter className="flex flex-col gap-2">
-                                <Button className="w-full" variant="outline">Читать подробнее</Button>
-                                <Button className="w-full"><ThumbsUp className="w-4 h-4 mr-2" /> Поддержать проект</Button>
-                            </CardFooter>
-                        </Card>
-                        {/* Placeholder for more cards */}
-                        <Card className="opacity-60 border-dashed">
-                            <CardContent className="flex flex-col items-center justify-center h-full min-h-[300px] text-center p-6">
-                                <div className="bg-muted p-4 rounded-full mb-4">
-                                    <Beaker className="w-8 h-8 text-muted-foreground" />
-                                </div>
-                                <h3 className="font-semibold mb-2">Ваша идея здесь</h3>
-                                <p className="text-sm text-muted-foreground mb-4">Предложите технологию и получите грант на тестирование</p>
-                                <Button variant="outline">Подать заявку</Button>
-                            </CardContent>
-                        </Card>
-                    </div>
-                </TabsContent>
 
-                {/* Zone B: Testing */}
-                <TabsContent value="testing" className="space-y-8">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h2 className="text-2xl font-bold">Технологии в тесте</h2>
-                            <p className="text-muted-foreground">Следите за реальными испытаниями в режиме реального времени.</p>
+                                <div className="space-y-4 col-span-2">
+                                    <h4 className="font-semibold mb-2">Промежуточные результаты:</h4>
+                                    <div className="grid sm:grid-cols-3 gap-4">
+                                        <div className="bg-background p-4 rounded-lg border">
+                                            <div className="text-sm text-muted-foreground mb-1">Точность</div>
+                                            <div className="text-2xl font-bold text-primary">89%</div>
+                                            <div className="text-xs text-muted-foreground">Цель: 85%</div>
+                                        </div>
+                                        <div className="bg-background p-4 rounded-lg border">
+                                            <div className="text-sm text-muted-foreground mb-1">Ложные тревоги</div>
+                                            <div className="text-2xl font-bold text-orange-500">8.7%</div>
+                                            <div className="text-xs text-muted-foreground">2 из 23</div>
+                                        </div>
+                                        <div className="bg-background p-4 rounded-lg border">
+                                            <div className="text-sm text-muted-foreground mb-1">Сэкономлено</div>
+                                            <div className="text-2xl font-bold text-green-600">~$1,200</div>
+                                            <div className="text-xs text-muted-foreground">На урожае</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </TabsContent>
+
+                    {/* Zone C: Proven */}
+                    <TabsContent value="proven" className="space-y-8 mt-0">
+                        <div className="flex justify-between items-center">
+                            <div>
+                                <h2 className="text-2xl font-bold">Проверенные решения</h2>
+                                <p className="text-muted-foreground">Каталог технологий, доказавших свою эффективность.</p>
+                            </div>
+                            <Button variant="outline">Фильтры</Button>
                         </div>
-                        <Button variant="outline">Смотреть live-трансляции</Button>
-                    </div>
 
-                    <Card className="border-primary/20 bg-primary/5">
-                        <CardHeader>
-                            <div className="flex justify-between items-start">
-                                <div className="flex items-center gap-2">
-                                    <Badge className="bg-green-500 hover:bg-green-600">Активный тест</Badge>
-                                    <span className="text-sm text-muted-foreground">Поле #7, Чуйская область</span>
-                                </div>
-                                <Button variant="ghost" size="sm">Подписаться</Button>
-                            </div>
-                            <CardTitle className="mt-2 text-2xl">AI-прогноз заморозков за 48 часов</CardTitle>
-                        </CardHeader>
-                        <CardContent className="grid md:grid-cols-3 gap-8">
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">Старт теста</span>
-                                    <span className="font-medium">15 марта 2026</span>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-muted-foreground">До завершения</span>
-                                    <span className="font-medium">47 дней</span>
-                                </div>
-                                <Progress value={45} className="h-2" />
-                            </div>
-
-                            <div className="space-y-4 col-span-2">
-                                <h4 className="font-semibold mb-2">Промежуточные результаты:</h4>
-                                <div className="grid sm:grid-cols-3 gap-4">
-                                    <div className="bg-background p-4 rounded-lg border">
-                                        <div className="text-sm text-muted-foreground mb-1">Точность</div>
-                                        <div className="text-2xl font-bold text-primary">89%</div>
-                                        <div className="text-xs text-muted-foreground">Цель: 85%</div>
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <Card className="flex flex-col">
+                                <CardHeader>
+                                    <div className="flex justify-between items-start mb-2">
+                                        <Badge variant="outline" className="border-green-500 text-green-600">Рекомендовано</Badge>
+                                        <div className="flex items-center text-yellow-500">
+                                            <span className="font-bold mr-1">4.8</span>
+                                            <StarIcon className="w-4 h-4 fill-current" />
+                                        </div>
                                     </div>
-                                    <div className="bg-background p-4 rounded-lg border">
-                                        <div className="text-sm text-muted-foreground mb-1">Ложные тревоги</div>
-                                        <div className="text-2xl font-bold text-orange-500">8.7%</div>
-                                        <div className="text-xs text-muted-foreground">2 из 23</div>
+                                    <CardTitle>Капельное орошение с AI-контроллером v2.3</CardTitle>
+                                    <CardDescription>Автоматическая оптимизация полива на основе влажности почвы.</CardDescription>
+                                </CardHeader>
+                                <CardContent className="flex-1 space-y-4">
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <div className="text-sm text-muted-foreground">Экономия воды</div>
+                                            <div className="font-semibold text-green-600">38%</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm text-muted-foreground">Рост урожая</div>
+                                            <div className="font-semibold text-green-600">+27%</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm text-muted-foreground">Окупаемость</div>
+                                            <div className="font-semibold">1.8 года</div>
+                                        </div>
+                                        <div>
+                                            <div className="text-sm text-muted-foreground">Стоимость</div>
+                                            <div className="font-semibold">$1,200 / га</div>
+                                        </div>
                                     </div>
-                                    <div className="bg-background p-4 rounded-lg border">
-                                        <div className="text-sm text-muted-foreground mb-1">Сэкономлено</div>
-                                        <div className="text-2xl font-bold text-green-600">~$1,200</div>
-                                        <div className="text-xs text-muted-foreground">На урожае</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-
-                {/* Zone C: Proven */}
-                <TabsContent value="proven" className="space-y-8">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <h2 className="text-2xl font-bold">Проверенные решения</h2>
-                            <p className="text-muted-foreground">Каталог технологий, доказавших свою эффективность.</p>
+                                </CardContent>
+                                <CardFooter className="grid grid-cols-2 gap-2">
+                                    <Button variant="outline">Скачать отчет</Button>
+                                    <Button>Купить</Button>
+                                </CardFooter>
+                            </Card>
                         </div>
-                        <Button variant="outline">Фильтры</Button>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-                        <Card className="flex flex-col">
-                            <CardHeader>
-                                <div className="flex justify-between items-start mb-2">
-                                    <Badge variant="outline" className="border-green-500 text-green-600">Рекомендовано</Badge>
-                                    <div className="flex items-center text-yellow-500">
-                                        <span className="font-bold mr-1">4.8</span>
-                                        <StarIcon className="w-4 h-4 fill-current" />
-                                    </div>
-                                </div>
-                                <CardTitle>Капельное орошение с AI-контроллером v2.3</CardTitle>
-                                <CardDescription>Автоматическая оптимизация полива на основе влажности почвы.</CardDescription>
-                            </CardHeader>
-                            <CardContent className="flex-1 space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <div className="text-sm text-muted-foreground">Экономия воды</div>
-                                        <div className="font-semibold text-green-600">38%</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-sm text-muted-foreground">Рост урожая</div>
-                                        <div className="font-semibold text-green-600">+27%</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-sm text-muted-foreground">Окупаемость</div>
-                                        <div className="font-semibold">1.8 года</div>
-                                    </div>
-                                    <div>
-                                        <div className="text-sm text-muted-foreground">Стоимость</div>
-                                        <div className="font-semibold">$1,200 / га</div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                            <CardFooter className="grid grid-cols-2 gap-2">
-                                <Button variant="outline">Скачать отчет</Button>
-                                <Button>Купить</Button>
-                            </CardFooter>
-                        </Card>
-                    </div>
-                </TabsContent>
+                    </TabsContent>
+                </div>
             </Tabs>
         </div>
     );
