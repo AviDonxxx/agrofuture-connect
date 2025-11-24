@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Sprout, Code2, GraduationCap, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const actions = [
   {
@@ -7,24 +8,28 @@ const actions = [
     title: "Я фермер",
     description: "хочу участвовать",
     gradient: "from-primary to-primary-light",
+    roleId: "farmer",
   },
   {
     icon: Code2,
     title: "Я разработчик",
     description: "хочу создавать решения",
     gradient: "from-secondary to-accent",
+    roleId: "developer",
   },
   {
     icon: GraduationCap,
     title: "Я студент",
     description: "хочу учиться",
     gradient: "from-primary-light to-primary",
+    roleId: "developer",
   },
   {
     icon: TrendingUp,
     title: "Я инвестор",
     description: "хочу поддержать",
     gradient: "from-accent to-secondary",
+    roleId: "sponsor",
   },
 ];
 
@@ -46,10 +51,12 @@ const CallToAction = () => {
             const Icon = action.icon;
             return (
               <Button
+                asChild
                 key={index}
                 variant="outline"
                 className="h-auto flex-col py-8 px-6 border-2 hover:border-primary group transition-all duration-300 hover:scale-105 hover:shadow-xl"
               >
+                <Link to={`/register?role=${action.roleId}`}>
                 <div className={`w-16 h-16 rounded-full bg-gradient-to-br ${action.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
                   <Icon className="w-8 h-8 text-white" />
                 </div>
@@ -59,6 +66,7 @@ const CallToAction = () => {
                 <div className="text-sm text-muted-foreground">
                   {action.description}
                 </div>
+                </Link>
               </Button>
             );
           })}
@@ -69,11 +77,12 @@ const CallToAction = () => {
             Не уверены, с чего начать? Свяжитесь с нами
           </p>
           <Button 
+            asChild
             variant="outline" 
             size="lg"
             className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
           >
-            Написать нам
+            <Link to="/register">Подать заявку</Link>
           </Button>
         </div>
       </div>

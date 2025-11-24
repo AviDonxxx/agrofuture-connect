@@ -21,6 +21,12 @@ const solutions = [
     solution: "Рост дохода фермеров на 25-35%",
     description: "Научно обоснованные рекомендации повышают качество и объём урожая",
   },
+  {
+    icon: waterIcon,
+    problem: "Потеря осадков",
+    solution: "Сбор дождевой воды",
+    description: "Мы организуем сбор дождевой воды с полей и крыш построек, направляем её в глубокие резервуары. Это позволяет использовать бесплатную влагу во время засух.",
+  },
 ];
 
 const ProblemSolution = () => {
@@ -36,7 +42,7 @@ const ProblemSolution = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {solutions.map((item, index) => (
             <div
               key={index}
@@ -50,17 +56,17 @@ const ProblemSolution = () => {
                   className="w-20 h-20 mx-auto"
                 />
               </div>
-              
+
               <h3 className="text-xl font-semibold text-destructive mb-2 text-center">
                 {item.problem}
               </h3>
-              
+
               <div className="h-1 w-16 bg-gradient-to-r from-primary to-secondary mx-auto mb-4" />
-              
+
               <p className="text-2xl font-bold text-primary mb-4 text-center">
                 {item.solution}
               </p>
-              
+
               <p className="text-muted-foreground text-center leading-relaxed">
                 {item.description}
               </p>
