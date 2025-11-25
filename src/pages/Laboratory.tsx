@@ -4,8 +4,78 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ThumbsUp, Beaker, CheckCircle2, Clock, TrendingUp, Users, Check } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ThumbsUp, Beaker, CheckCircle2, Clock, TrendingUp, Users, Check, Filter, ShoppingCart, Lightbulb } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SubmitIdeaDialog } from "@/components/laboratory/SubmitIdeaDialog";
+
+import { useUserHistory } from "@/hooks/useUserHistory";
+import { toast } from "sonner";
+
+// Mock Data for Proven Solutions
+interface Solution {
+    id: string;
+    title: string;
+    description: string;
+    price: number;
+    unit: string;
+    rating: number;
+    status: "recommended" | "tested" | "new";
+    type: "irrigation" | "monitoring" | "automation";
+    stats: {
+        water?: string;
+        yield?: string;
+        roi?: string;
+    };
+}
+
+const SOLUTIONS: Solution[] = [
+    {
+        id: "sol-1",
+        title: "Капельное орошение с AI-контроллером v2.3",
+        description: "Автоматическая оптимизация полива на основе влажности почвы.",
+        price: 1200,
+        unit: "/ га",
+        rating: 4.8,
+        status: "recommended",
+        type: "irrigation",
+        stats: { water: "38%", yield: "+27%", roi: "1.8 года" }
+    },
+    {
+        id: "sol-2",
+        title: "Дрон-мониторинг полей (Подписка)",
+        description: "Еженедельный облет и анализ NDVI индексов.",
+        price: 200,
+        unit: "/ мес",
+        rating: 4.5,
+        status: "tested",
+        type: "monitoring",
+        stats: { yield: "+15%", roi: "6 мес" }
+    },
+    {
+        id: "sol-3",
+        title: "Умная теплица 'GreenBox'",
+        description: "Полная автоматизация климата для закрытого грунта.",
+        price: 5000,
+        unit: "/ комплект",
+        rating: 4.9,
+        status: "new",
+        type: "automation",
+        stats: { yield: "+40%", roi: "2.5 года" }
+    },
+    {
+        id: "sol-4",
+        title: "Датчики влажности почвы (LoRaWAN)",
+        description: "Сет из 5 датчиков с дальностью до 10 км.",
+        price: 450,
+        unit: "/ сет",
+        rating: 4.7,
+        status: "tested",
+        type: "monitoring",
+        stats: { water: "20%", roi: "1 год" }
+    }
+];
 
 export default function Laboratory() {
     // Tab Persistence
@@ -15,6 +85,7 @@ export default function Laboratory() {
 
     useEffect(() => {
         localStorage.setItem("laboratory_active_tab", activeTab);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }, [activeTab]);
 
     // Action Persistence (Supported Projects)
@@ -27,13 +98,64 @@ export default function Laboratory() {
         localStorage.setItem("laboratory_supported_projects", JSON.stringify(supportedProjects));
     }, [supportedProjects]);
 
-    const toggleSupport = (id: string) => {
-        setSupportedProjects(prev =>
-            prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
-        );
+    const { addHistoryItem } = useUserHistory();
+    const [ideaDialogOpen, setIdeaDialogOpen] = useState(false);
+
+    const toggleSupport = (id: string, name: string) => {
+        if (supportedProjects.includes(id)) {
+            setSupportedProjects(prev => prev.filter(p => p !== id));
+            toast.info("Вы отозвали поддержку", { description: name });
+        } else {
+            setSupportedProjects(prev => [...prev, id]);
+            addHistoryItem({
+                type: 'support',
+                title: `Поддержан проект: ${name}`,
+                details: "Ваш голос учтен",
+                status: 'completed'
+            });
+            toast.success("Спасибо за поддержку!", { description: `Вы проголосовали за ${name}` });
+        }
     };
 
     const isSupported = (id: string) => supportedProjects.includes(id);
+
+    // Filters State
+    const [showFilters, setShowFilters] = useState(false);
+    const [filters, setFilters] = useState({
+        status: "all",
+        type: "all",
+        maxPrice: 10000
+    });
+
+    const filteredSolutions = SOLUTIONS.filter(sol => {
+        if (filters.status !== "all" && sol.status !== filters.status) return false;
+        if (filters.type !== "all" && sol.type !== filters.type) return false;
+        if (sol.price > filters.maxPrice) return false;
+        return true;
+    });
+
+    const handleAddToCart = (sol: Solution) => {
+        addHistoryItem({
+            type: 'purchase',
+            title: `Добавлено в корзину: ${sol.title}`,
+            amount: `${sol.price} сом`,
+            rawAmount: sol.price,
+            details: "Из каталога проверенных решений",
+            status: 'pending'
+        });
+        toast.success("Добавлено в корзину", { description: sol.title });
+    };
+
+    const handleView = (title: string, price: number) => {
+        addHistoryItem({
+            type: 'view',
+            title: `Просмотр: ${title}`,
+            amount: `${price} сом`,
+            rawAmount: price,
+            details: "Просмотр решения",
+            status: 'viewed'
+        });
+    };
 
     return (
         <div className="container py-12 space-y-16">
@@ -42,6 +164,11 @@ export default function Laboratory() {
                 <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
                     Marketplace инноваций: предлагайте идеи, следите за тестами и выбирайте проверенные решения.
                 </p>
+                <div className="flex justify-center gap-4 pt-4">
+                    <Button size="lg" onClick={() => setIdeaDialogOpen(true)}>
+                        <Lightbulb className="w-4 h-4 mr-2" /> Предложить идею
+                    </Button>
+                </div>
             </div>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -67,7 +194,6 @@ export default function Laboratory() {
                                 <h2 className="text-2xl font-bold">Идеи на рассмотрении</h2>
                                 <p className="text-muted-foreground">Голосуйте за технологии, которые хотите увидеть на полях.</p>
                             </div>
-                            <Button>Предложить идею</Button>
                         </div>
 
                         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -99,7 +225,7 @@ export default function Laboratory() {
                                     <Button className="w-full" variant="outline">Читать подробнее</Button>
                                     <Button
                                         className={cn("w-full transition-colors", isSupported("bio-sensor") ? "bg-green-600 hover:bg-green-700" : "")}
-                                        onClick={() => toggleSupport("bio-sensor")}
+                                        onClick={() => toggleSupport("bio-sensor", "Биосенсор болезней растений")}
                                     >
                                         {isSupported("bio-sensor") ? (
                                             <>
@@ -121,7 +247,7 @@ export default function Laboratory() {
                                     </div>
                                     <h3 className="font-semibold mb-2">Ваша идея здесь</h3>
                                     <p className="text-sm text-muted-foreground mb-4">Предложите технологию и получите грант на тестирование</p>
-                                    <Button variant="outline">Подать заявку</Button>
+                                    <SubmitIdeaDialog trigger={<Button variant="outline">Подать заявку</Button>} />
                                 </CardContent>
                             </Card>
                         </div>
@@ -192,51 +318,117 @@ export default function Laboratory() {
                                 <h2 className="text-2xl font-bold">Проверенные решения</h2>
                                 <p className="text-muted-foreground">Каталог технологий, доказавших свою эффективность.</p>
                             </div>
-                            <Button variant="outline">Фильтры</Button>
+                            <Button
+                                variant={showFilters ? "secondary" : "outline"}
+                                onClick={() => setShowFilters(!showFilters)}
+                            >
+                                <Filter className="w-4 h-4 mr-2" /> Фильтры
+                            </Button>
                         </div>
 
+                        {showFilters && (
+                            <div className="bg-muted/50 p-4 rounded-lg grid md:grid-cols-3 gap-4 animate-in fade-in slide-in-from-top-2">
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Статус</label>
+                                    <Select value={filters.status} onValueChange={(val) => setFilters({ ...filters, status: val })}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Все статусы" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Все</SelectItem>
+                                            <SelectItem value="recommended">Рекомендовано</SelectItem>
+                                            <SelectItem value="tested">Протестировано</SelectItem>
+                                            <SelectItem value="new">Новое</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Тип решения</label>
+                                    <Select value={filters.type} onValueChange={(val) => setFilters({ ...filters, type: val })}>
+                                        <SelectTrigger>
+                                            <SelectValue placeholder="Все типы" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Все</SelectItem>
+                                            <SelectItem value="irrigation">Орошение</SelectItem>
+                                            <SelectItem value="monitoring">Мониторинг</SelectItem>
+                                            <SelectItem value="automation">Автоматизация</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">Макс. цена: ${filters.maxPrice}</label>
+                                    <Input
+                                        type="range"
+                                        min="0"
+                                        max="10000"
+                                        step="100"
+                                        value={filters.maxPrice}
+                                        onChange={(e) => setFilters({ ...filters, maxPrice: Number(e.target.value) })}
+                                    />
+                                </div>
+                            </div>
+                        )}
+
                         <div className="grid md:grid-cols-2 gap-6">
-                            <Card className="flex flex-col">
-                                <CardHeader>
-                                    <div className="flex justify-between items-start mb-2">
-                                        <Badge variant="outline" className="border-green-500 text-green-600">Рекомендовано</Badge>
-                                        <div className="flex items-center text-yellow-500">
-                                            <span className="font-bold mr-1">4.8</span>
-                                            <StarIcon className="w-4 h-4 fill-current" />
+                            {filteredSolutions.map((sol) => (
+                                <Card key={sol.id} className="flex flex-col" onMouseEnter={() => handleView(sol.title, sol.price)}>
+                                    <CardHeader>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <Badge variant="outline" className={cn(
+                                                sol.status === "recommended" ? "border-green-500 text-green-600" :
+                                                    sol.status === "new" ? "border-blue-500 text-blue-600" :
+                                                        "border-orange-500 text-orange-600"
+                                            )}>
+                                                {sol.status === "recommended" ? "Рекомендовано" : sol.status === "new" ? "Новинка" : "Протестировано"}
+                                            </Badge>
+                                            <div className="flex items-center text-yellow-500">
+                                                <span className="font-bold mr-1">{sol.rating}</span>
+                                                <StarIcon className="w-4 h-4 fill-current" />
+                                            </div>
                                         </div>
-                                    </div>
-                                    <CardTitle>Капельное орошение с AI-контроллером v2.3</CardTitle>
-                                    <CardDescription>Автоматическая оптимизация полива на основе влажности почвы.</CardDescription>
-                                </CardHeader>
-                                <CardContent className="flex-1 space-y-4">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <div className="text-sm text-muted-foreground">Экономия воды</div>
-                                            <div className="font-semibold text-green-600">38%</div>
+                                        <CardTitle>{sol.title}</CardTitle>
+                                        <CardDescription>{sol.description}</CardDescription>
+                                    </CardHeader>
+                                    <CardContent className="flex-1 space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {sol.stats.water && (
+                                                <div>
+                                                    <div className="text-sm text-muted-foreground">Экономия воды</div>
+                                                    <div className="font-semibold text-green-600">{sol.stats.water}</div>
+                                                </div>
+                                            )}
+                                            {sol.stats.yield && (
+                                                <div>
+                                                    <div className="text-sm text-muted-foreground">Рост урожая</div>
+                                                    <div className="font-semibold text-green-600">{sol.stats.yield}</div>
+                                                </div>
+                                            )}
+                                            {sol.stats.roi && (
+                                                <div>
+                                                    <div className="text-sm text-muted-foreground">Окупаемость</div>
+                                                    <div className="font-semibold">{sol.stats.roi}</div>
+                                                </div>
+                                            )}
+                                            <div>
+                                                <div className="text-sm text-muted-foreground">Стоимость</div>
+                                                <div className="font-semibold">${sol.price} {sol.unit}</div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <div className="text-sm text-muted-foreground">Рост урожая</div>
-                                            <div className="font-semibold text-green-600">+27%</div>
-                                        </div>
-                                        <div>
-                                            <div className="text-sm text-muted-foreground">Окупаемость</div>
-                                            <div className="font-semibold">1.8 года</div>
-                                        </div>
-                                        <div>
-                                            <div className="text-sm text-muted-foreground">Стоимость</div>
-                                            <div className="font-semibold">$1,200 / га</div>
-                                        </div>
-                                    </div>
-                                </CardContent>
-                                <CardFooter className="grid grid-cols-2 gap-2">
-                                    <Button variant="outline">Скачать отчет</Button>
-                                    <Button>Купить</Button>
-                                </CardFooter>
-                            </Card>
+                                    </CardContent>
+                                    <CardFooter className="grid grid-cols-2 gap-2">
+                                        <Button variant="outline">Скачать отчет</Button>
+                                        <Button onClick={() => handleAddToCart(sol)}>
+                                            <ShoppingCart className="w-4 h-4 mr-2" /> Купить
+                                        </Button>
+                                    </CardFooter>
+                                </Card>
+                            ))}
                         </div>
                     </TabsContent>
                 </div>
             </Tabs>
+            <SubmitIdeaDialog open={ideaDialogOpen} onOpenChange={setIdeaDialogOpen} />
         </div>
     );
 }

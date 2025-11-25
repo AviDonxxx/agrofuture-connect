@@ -15,6 +15,7 @@ import Support from "./pages/Support";
 import Laboratory from "./pages/Laboratory";
 import DigitalTwin from "./pages/DigitalTwin";
 import Marketplace from "./pages/Marketplace";
+import Profile from "./pages/Profile";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/register" element={<Register />} />
             <Route path="/support" element={<Support />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

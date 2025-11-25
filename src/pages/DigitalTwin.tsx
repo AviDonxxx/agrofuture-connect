@@ -1,17 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Droplets, Sun, ArrowRight, Check, Play, BarChart3 } from "lucide-react";
+import { MapPin, Play, BarChart3 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function DigitalTwin() {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
 
+    // Form State with Persistence
+    const [formData, setFormData] = useState(() => {
+        const saved = localStorage.getItem("digital_twin_form");
+        return saved ? JSON.parse(saved) : {
+            location: "",
+            area: "",
+            crop: "",
+            waterSource: "",
+            budget: ""
+        };
+    });
+
+    useEffect(() => {
+        localStorage.setItem("digital_twin_form", JSON.stringify(formData));
+    }, [formData]);
+
+    const updateField = (field: string, value: string) => {
+        setFormData((prev: any) => ({ ...prev, [field]: value }));
+    };
+
     const handleAnalyze = () => {
+        // Validation
+        if (!formData.location || !formData.area || !formData.crop || !formData.waterSource || !formData.budget) {
+            toast.error("Пожалуйста, заполните все поля", {
+                description: "Для точной симуляции нам нужны все данные."
+            });
+            return;
+        }
+
         setLoading(true);
         setTimeout(() => {
             setLoading(false);
@@ -48,22 +77,43 @@ export default function DigitalTwin() {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
-                            <Label>Где ваше поле?</Label>
-                            <div className="flex gap-2">
-                                <Button variant="outline" className="w-full justify-start text-muted-foreground">
-                                    <MapPin className="w-4 h-4 mr-2" /> Выбрать на карте
-                                </Button>
+                            <Label htmlFor="location">Где ваше поле? <span className="text-red-500">*</span></Label>
+                            <div className="relative">
+                                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                <Input
+                                    id="location"
+                                    placeholder="Например: Чуйская область, с. Беловодское"
+                                    className="pl-9"
+                                    value={formData.location}
+                                    onChange={(e) => updateField("location", e.target.value)}
+                                    list="regions"
+                                />
+                                <datalist id="regions">
+                                    <option value="Чуйская область" />
+                                    <option value="Иссык-Кульская область" />
+                                    <option value="Ошская область" />
+                                    <option value="Джалал-Абадская область" />
+                                    <option value="Нарынская область" />
+                                    <option value="Таласская область" />
+                                    <option value="Баткенская область" />
+                                </datalist>
                             </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <Label>Площадь (га)</Label>
-                                <Input type="number" placeholder="10" />
+                                <Label htmlFor="area">Площадь (га) <span className="text-red-500">*</span></Label>
+                                <Input
+                                    id="area"
+                                    type="number"
+                                    placeholder="10"
+                                    value={formData.area}
+                                    onChange={(e) => updateField("area", e.target.value)}
+                                />
                             </div>
                             <div className="space-y-2">
-                                <Label>Культура</Label>
-                                <Select>
+                                <Label>Культура <span className="text-red-500">*</span></Label>
+                                <Select value={formData.crop} onValueChange={(val) => updateField("crop", val)}>
                                     <SelectTrigger>
                                         <SelectValue placeholder="Выберите культуру" />
                                     </SelectTrigger>
@@ -78,8 +128,8 @@ export default function DigitalTwin() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Источник воды</Label>
-                            <Select>
+                            <Label>Источник воды <span className="text-red-500">*</span></Label>
+                            <Select value={formData.waterSource} onValueChange={(val) => updateField("waterSource", val)}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Выберите источник" />
                                 </SelectTrigger>
@@ -92,12 +142,54 @@ export default function DigitalTwin() {
                         </div>
 
                         <div className="space-y-2">
-                            <Label>Бюджет на технологии (сом)</Label>
-                            <Input type="number" placeholder="100000" />
+                            <Label htmlFor="budget">Бюджет на технологии (сом) <span className="text-red-500">*</span></Label>
+                            <div className="flex gap-2">
+                                <Input
+                                    id="budget"
+                                    type="number"
+                                    placeholder="100000"
+                                    value={formData.budget}
+                                    onChange={(e) => updateField("budget", e.target.value)}
+                                />
+                                <Button
+                                    variant="outline"
+                                    onClick={() => {
+                                        const area = parseFloat(formData.area) || 0;
+                                        let costPerHa = 0;
+                                        switch (formData.crop) {
+                                            case 'wheat': costPerHa = 15000; break;
+                                            case 'corn': costPerHa = 20000; break;
+                                            case 'potato': costPerHa = 45000; break;
+                                            case 'apple': costPerHa = 60000; break;
+                                            default: costPerHa = 10000;
+                                        }
+                                        if (area > 0) {
+                                            updateField("budget", (area * costPerHa).toString());
+                                            toast.info("Бюджет рассчитан автоматически", {
+                                                description: `~${costPerHa} сом/га для выбранной культуры`
+                                            });
+                                        } else {
+                                            toast.error("Сначала укажите площадь");
+                                        }
+                                    }}
+                                    type="button"
+                                    title="Рассчитать рекомендуемый бюджет"
+                                >
+                                    Авто-расчет
+                                </Button>
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                * Нажмите "Авто-расчет" для примерной оценки
+                            </p>
                         </div>
                     </CardContent>
                     <CardFooter>
-                        <Button className="w-full" size="lg" onClick={handleAnalyze} disabled={loading}>
+                        <Button
+                            className="w-full"
+                            size="lg"
+                            onClick={handleAnalyze}
+                            disabled={loading || !formData.location || !formData.area || !formData.crop || !formData.waterSource || !formData.budget}
+                        >
                             {loading ? "Анализируем данные..." : "Создать двойника и получить рекомендации"}
                         </Button>
                     </CardFooter>

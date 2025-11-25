@@ -2,6 +2,8 @@ import React from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Check, Star, Zap, Award } from "lucide-react";
+import { useUserHistory } from "@/hooks/useUserHistory";
+import { toast } from "sonner";
 
 const programs = [
   {
@@ -81,6 +83,21 @@ const pricing = [
 
 const Learning = () => {
   const [selectedPlan, setSelectedPlan] = React.useState<string | null>("Продвинутый");
+  const { addHistoryItem } = useUserHistory();
+
+  const handleParticipate = (plan: string, price: string) => {
+    addHistoryItem({
+      type: 'participate',
+      title: `Курс: ${plan}`,
+      amount: price,
+      rawAmount: parseInt(price.replace(/\D/g, '')),
+      details: "Заявка на обучение",
+      status: 'pending'
+    });
+    toast.success("Вы записались на курс!", {
+      description: `Тариф "${plan}" выбран. Менеджер свяжется с вами.`
+    });
+  };
 
   return (
     <div className="space-y-12 pb-16">
@@ -158,7 +175,14 @@ const Learning = () => {
                   </ul>
                 </CardContent>
                 <CardFooter>
-                  <Button className="w-full" variant={isSelected ? "default" : "outline"}>
+                  <Button
+                    className="w-full"
+                    variant={isSelected ? "default" : "outline"}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleParticipate(plan.title, plan.price);
+                    }}
+                  >
                     {isSelected ? "Выбран" : "Выбрать тариф"}
                   </Button>
                 </CardFooter>

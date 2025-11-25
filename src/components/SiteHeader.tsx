@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import BrandLogo from "@/components/BrandLogo";
+import { UserActivity } from "@/components/UserActivity";
 
 const navItems = [
   { label: "Главная", to: "/" },
@@ -19,7 +20,7 @@ const SiteHeader = () => {
   const location = useLocation();
 
   return (
-    <header className="sticky top-0 z-50 bg-background/80 backdrop-blur border-b border-border">
+    <header className="sticky top-0 z-[10000] bg-background/80 backdrop-blur border-b border-border">
       <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-4">
         <Link to="/" className="shrink-0">
           <BrandLogo />
@@ -42,13 +43,19 @@ const SiteHeader = () => {
           ))}
         </nav>
 
-        <Button asChild size="lg" className="px-6">
-          <Link to="/register">Подать заявку</Link>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Link to="/profile">
+            <Button variant="outline" size="icon" className="relative">
+              <UserActivity />
+            </Button>
+          </Link>
+          <Button asChild size="lg" className="px-6">
+            <Link to="/register">Подать заявку</Link>
+          </Button>
+        </div>
       </div>
     </header>
   );
 };
 
 export default SiteHeader;
-
