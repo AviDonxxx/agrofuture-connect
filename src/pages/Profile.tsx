@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useUserHistory, HistoryItemType, HistoryItemStatus } from "@/hooks/useUserHistory";
-import { History, ShoppingCart, ThumbsUp, Lightbulb, MessageSquare, Megaphone, UserPlus, Eye, Filter, Trash2, Wallet, Activity, Heart } from "lucide-react";
+import { History, ShoppingCart, ThumbsUp, Lightbulb, MessageSquare, Megaphone, UserPlus, Eye, Trash2, Wallet, Activity, Heart, GraduationCap } from "lucide-react";
 
 export default function Profile() {
     const { history, clearHistory, getStats } = useUserHistory();
@@ -26,6 +26,7 @@ export default function Profile() {
 
     const getIcon = (type: HistoryItemType) => {
         switch (type) {
+            case 'course': return <GraduationCap className="w-4 h-4 text-violet-500" />;
             case 'purchase': return <ShoppingCart className="w-4 h-4 text-blue-500" />;
             case 'support': return <ThumbsUp className="w-4 h-4 text-green-500" />;
             case 'idea': return <Lightbulb className="w-4 h-4 text-yellow-500" />;
@@ -119,6 +120,7 @@ export default function Profile() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="all">Все типы</SelectItem>
+                                <SelectItem value="course">Курсы</SelectItem>
                                 <SelectItem value="purchase">Покупки</SelectItem>
                                 <SelectItem value="support">Поддержка</SelectItem>
                                 <SelectItem value="idea">Идеи</SelectItem>

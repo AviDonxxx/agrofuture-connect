@@ -1,10 +1,30 @@
-import { useEffect, useState } from "react";
+import { Droplets, TrendingUp, Users, Leaf } from "lucide-react";
 
-const stats = [
-  { value: 48, label: "га умных полей", suffix: "" },
-  { value: 127000, label: "сэкономлено воды", suffix: "м³" },
-  { value: 2847, label: "обученных фермеров", suffix: "" },
-  { value: 32, label: "средний рост урожайности", suffix: "%" },
+const goals = [
+  {
+    icon: Droplets,
+    label: "Экономия поливной воды",
+    description: "Снижение расхода ресурсов за счёт умных ИИ-рекомендаций и датчиков.",
+    color: "text-blue-400"
+  },
+  {
+    icon: TrendingUp,
+    label: "Рост урожайности",
+    description: "Повышение эффективности за счёт осознанного выбора культур и режимов полива.",
+    color: "text-emerald-400"
+  },
+  {
+    icon: Users,
+    label: "Обучение фермеров",
+    description: "Развитие навыков работы с ИИ-технологиями в сельском хозяйстве.",
+    color: "text-amber-400"
+  },
+  {
+    icon: Leaf,
+    label: "Эко-устойчивость",
+    description: "Внедрение бережных технологий возделывания почв для будущих поколений.",
+    color: "text-secondary"
+  },
 ];
 
 const Statistics = () => {
@@ -19,65 +39,38 @@ const Statistics = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            Цифры, которые говорят сами
+        <div className="text-center mb-16 space-y-4">
+          <h2 className="text-4xl md:text-5xl font-bold">
+            Цели и потенциал AgroFarm
           </h2>
-          <p className="text-xl text-primary-foreground/80">
-            Реальные результаты проекта АгроПоле-242
+          <p className="text-xl text-primary-foreground/80 max-w-2xl mx-auto">
+            Основные направления развития и ожидаемые эффекты от внедрения пилотного проекта
           </p>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {stats.map((stat, index) => (
-            <StatCard key={index} {...stat} index={index} />
-          ))}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          {goals.map((goal, index) => {
+            const Icon = goal.icon;
+            return (
+              <div
+                key={index}
+                className="bg-white/5 border border-white/10 rounded-3xl p-6 text-center space-y-4 hover:bg-white/10 transition-colors"
+              >
+                <div className="flex justify-center">
+                  <div className={`p-3 rounded-2xl bg-white/10 ${goal.color}`}>
+                    <Icon className="w-8 h-8" />
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold">{goal.label}</h3>
+                <p className="text-sm text-primary-foreground/70 leading-relaxed">
+                  {goal.description}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>
-  );
-};
-
-const StatCard = ({ value, label, suffix, index }: {
-  value: number;
-  label: string;
-  suffix: string;
-  index: number;
-}) => {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const duration = 2000;
-    const steps = 60;
-    const increment = value / steps;
-    let current = 0;
-
-    const timer = setInterval(() => {
-      current += increment;
-      if (current >= value) {
-        setCount(value);
-        clearInterval(timer);
-      } else {
-        setCount(Math.floor(current));
-      }
-    }, duration / steps);
-
-    return () => clearInterval(timer);
-  }, [value]);
-
-  return (
-    <div
-      className="text-center animate-count-up"
-      style={{ animationDelay: `${index * 0.1}s` }}
-    >
-      <div className="text-4xl md:text-6xl font-bold text-secondary mb-2">
-        {count.toLocaleString('ru-RU')}
-        {suffix && <span className="text-3xl md:text-4xl ml-1">{suffix}</span>}
-      </div>
-      <div className="text-sm md:text-base text-primary-foreground/90 font-medium">
-        {label}
-      </div>
-    </div>
   );
 };
 

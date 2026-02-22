@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 
-export type HistoryItemType = 'purchase' | 'support' | 'idea' | 'message' | 'ad' | 'participate' | 'digital_twin' | 'view';
+export type HistoryItemType = 'course' | 'purchase' | 'support' | 'idea' | 'message' | 'ad' | 'participate' | 'digital_twin' | 'view';
 export type HistoryItemStatus = 'completed' | 'pending' | 'viewed' | 'rejected';
 
 export interface HistoryItem {
@@ -16,14 +16,26 @@ export interface HistoryItem {
 
 const STORAGE_KEY = 'user_activity_history';
 
+const DEMO_COURSE_ITEM: HistoryItem = {
+    id: 'demo-course',
+    type: 'course',
+    title: 'Курс: Базовый',
+    timestamp: new Date(new Date().getFullYear(), 1, 21, 13, 29).getTime(),
+    amount: '15 000 с',
+    rawAmount: 15000,
+    details: 'Заявка на обучение',
+    status: 'pending',
+};
+
 export function useUserHistory() {
     const [history, setHistory] = useState<HistoryItem[]>(() => {
         try {
             const saved = localStorage.getItem(STORAGE_KEY);
-            return saved ? JSON.parse(saved) : [];
+            if (saved) return JSON.parse(saved);
+            return [DEMO_COURSE_ITEM];
         } catch (e) {
             console.error("Failed to load history", e);
-            return [];
+            return [DEMO_COURSE_ITEM];
         }
     });
 

@@ -1,38 +1,22 @@
 const stack = [
   {
-    title: "Frontend",
+    title: "Базовый стек MVP",
     items: [
-      "React / Next.js для SSR и SEO",
-      "Tailwind CSS для быстрой стилизации",
-      "Recharts для дашбордов",
-      "Leaflet / Mapbox для карт полей",
+      "React / Next.js — основа интерфейса",
+      "Tailwind CSS — современная стилизация",
+      "Lucide / Recharts — иконки и базовые графики",
+      "Node.js / Python — серверная логика и API",
+      "PostgreSQL — надежное хранение данных",
     ],
   },
   {
-    title: "Backend & Data",
+    title: "Масштабирование (Future)",
     items: [
-      "Node.js (Express) или Python (FastAPI)",
-      "PostgreSQL: поля, пользователи, датчики",
-      "InfluxDB: временные ряды телеметрии",
-      "MQTT + WebSocket для real-time обновлений",
-    ],
-  },
-  {
-    title: "Хостинг и инфраструктура",
-    items: [
-      "Vercel для фронтенда (free tier)",
-      "DigitalOcean / Hetzner для API ($10-20/мес)",
-      "Cloudflare CDN для ускорения",
-      "Google Analytics + Hotjar для аналитики",
-    ],
-  },
-  {
-    title: "Дополнительно",
-    items: [
-      "Telegram Bot API — уведомления фермерам",
-      "CI/CD и мониторинг энергопотребления",
-      "Интеграции с ERP и банковскими сервисами",
-      "Экспорт данных для государственных систем",
+      "MQTT & InfluxDB — промышленный IoT",
+      "Интеграции с ERP и гос-системами",
+      "Банковские API для транзакций",
+      "Автоматизация мониторинга энергии",
+      "Продвинутая ML-аналитика почвы",
     ],
   },
 ];
@@ -43,13 +27,13 @@ const TechStackSection = () => {
       <div className="container mx-auto px-4 space-y-8">
         <div className="text-center space-y-3 max-w-3xl mx-auto">
           <p className="text-sm uppercase tracking-[0.4em] text-secondary">Технический стек</p>
-          <h2 className="text-4xl font-bold">Рекомендованная архитектура для масштабирования</h2>
+          <h2 className="text-4xl font-bold">Архитектура и готовность к росту</h2>
           <p className="text-muted-foreground text-lg">
-            Мы комбинируем лучшие инструменты для карт, IoT и аналитики, чтобы быстро запускать MVP и уверенно выходить на промышленный уровень.
+            Это стек, на котором мы строим MVP. Он выбран для обеспечения быстрого старта, надежности и полной готовности к масштабированию до промышленного уровня.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-6">
+        <div className="grid md:grid-cols-2 gap-6 max-w-4xl mx-auto">
           {stack.map((category) => (
             <div key={category.title} className="rounded-3xl border border-border bg-card p-6 shadow-sm space-y-3">
               <h3 className="text-2xl font-semibold text-primary">{category.title}</h3>

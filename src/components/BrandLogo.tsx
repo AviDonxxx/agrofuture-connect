@@ -23,7 +23,7 @@ const BrandLogo = () => {
         </svg>
       </span>
       <div className="leading-tight">
-        <p className="text-lg font-black tracking-wide text-primary">АгроПоле-242</p>
+        <p className="text-lg font-black tracking-wide text-primary">AgroFarm</p>
         <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">земля • ai • фермеры</p>
       </div>
     </div>

@@ -12,10 +12,9 @@ import Learning from "./pages/Learning";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import Support from "./pages/Support";
-import Laboratory from "./pages/Laboratory";
-import DigitalTwin from "./pages/DigitalTwin";
-import Marketplace from "./pages/Marketplace";
 import Profile from "./pages/Profile";
+import AgroAdvisor from "./pages/AgroAdvisor";
+import History from "./pages/History";
 
 const queryClient = new QueryClient();
 
@@ -32,12 +31,11 @@ const App = () => (
             <Route path="/fields" element={<Fields />} />
             <Route path="/results" element={<Results />} />
             <Route path="/learning" element={<Learning />} />
-            <Route path="/laboratory" element={<Laboratory />} />
-            <Route path="/digital-twin" element={<DigitalTwin />} />
-            <Route path="/marketplace" element={<Marketplace />} />
             <Route path="/register" element={<Register />} />
             <Route path="/support" element={<Support />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/agro-advisor" element={<AgroAdvisor />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

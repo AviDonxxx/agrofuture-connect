@@ -57,7 +57,7 @@ const RegistrationForms = ({ highlightRole }: RegistrationFormsProps = {}) => {
           <p className="text-sm uppercase tracking-widest text-secondary">Регистрация</p>
           <h2 className="text-4xl font-bold">Присоединяйтесь к экосистеме</h2>
           <p className="text-muted-foreground text-lg">
-            Заполните форму — команда АгроПоле свяжется в течение 24 часов, чтобы провести онбординг и подобрать программу поддержки.
+            Заполните форму — команда AgroFarm свяжется в течение 24 часов, чтобы провести онбординг и подобрать программу поддержки.
           </p>
           <p className="text-sm text-muted-foreground">
             *Все поля временно сохраняются в Local Storage — так вы можете продолжить заполнение позже или экспортировать заявку.
@@ -108,9 +108,8 @@ const RoleForm = ({
 
   return (
     <div
-      className={`rounded-3xl border bg-card p-6 shadow-lg space-y-4 transition-all ${
-        isHighlighted ? "border-primary ring-4 ring-primary/20" : "border-border"
-      }`}
+      className={`rounded-3xl border bg-card p-6 shadow-lg space-y-4 transition-all ${isHighlighted ? "border-primary ring-4 ring-primary/20" : "border-border"
+        }`}
     >
       <div>
         <h3 className="text-2xl font-semibold">{config.title}</h3>
@@ -203,7 +202,7 @@ export default RegistrationForms;
 const persistRegistration = (roleId: RoleId, values: FormValues) => {
   if (typeof window === "undefined") return;
   try {
-    const key = `agropole_${roleId}_registrations`;
+    const key = `agrofarm_${roleId}_registrations`;
     const payload = {
       ...values,
       role: roleId,

@@ -31,7 +31,7 @@ const RoadmapPlan = () => {
       <div className="container mx-auto px-4 space-y-8">
         <div className="text-center space-y-3">
           <p className="text-sm uppercase tracking-[0.4em] text-secondary">План разработки</p>
-          <h2 className="text-4xl font-bold">Как мы развиваем «АгроПоле-242»</h2>
+          <h2 className="text-4xl font-bold">Как мы развиваем AgroFarm</h2>
           <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
             Пошаговая дорожная карта превращает проект из пилота в самоокупаемую платформу для горных и энергодефицитных регионов.
           </p>

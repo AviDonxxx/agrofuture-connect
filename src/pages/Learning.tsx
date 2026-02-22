@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Check, Star, Zap, Award } from "lucide-react";
 import { useUserHistory } from "@/hooks/useUserHistory";
 import { toast } from "sonner";
+import { AgroLearningSection } from "@/components/AgroLearning";
 
 const programs = [
   {
@@ -106,9 +107,13 @@ const Learning = () => {
           <p className="text-secondary uppercase tracking-[0.4em] text-sm">Обучение</p>
           <h1 className="text-4xl md:text-5xl font-bold">Учимся и создаём вместе</h1>
           <p className="text-muted-foreground text-lg max-w-3xl mx-auto">
-            Академия АгроПоле объединяет фермеров, инженеров и инвесторов: вебинары, офлайн-полевые школы, акселератор агро-стартапов.
+            Академия AgroFarm объединяет фермеров, инженеров и инвесторов: вебинары, офлайн-полевые школы, акселератор агро-стартапов.
           </p>
         </div>
+      </section>
+
+      <section className="container mx-auto px-4">
+        <AgroLearningSection />
       </section>
 
       <section className="container mx-auto px-4 space-y-6">

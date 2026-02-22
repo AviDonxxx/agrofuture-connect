@@ -15,7 +15,7 @@ export function AIChat() {
     const [messages, setMessages] = useState<Message[]>([
         {
             id: "1",
-            text: "Здравствуйте! Я ИИ-помощник АгроПоле. Чем могу помочь?",
+            text: "Здравствуйте! Я ИИ-помощник AgroFarm. Чем могу помочь?",
             sender: "ai",
             timestamp: new Date(),
         },
@@ -63,7 +63,7 @@ export function AIChat() {
             return "Для регистрации перейдите в раздел 'Регистрация' в верхнем меню. Если у вас проблемы со входом, попробуйте сбросить пароль.";
         }
         if (lowerInput.includes("привет")) {
-            return "Привет! Готов ответить на ваши вопросы по сервису АгроПоле.";
+            return "Привет! Готов ответить на ваши вопросы по сервису AgroFarm.";
         }
         return "Я пока учусь и не могу точно ответить на этот вопрос. Попробуйте переформулировать или обратитесь к живому оператору.";
     };
@@ -100,8 +100,8 @@ export function AIChat() {
                             </div>
                             <div
                                 className={`p-3 rounded-lg max-w-[80%] text-sm ${msg.sender === "user"
-                                        ? "bg-secondary text-secondary-foreground"
-                                        : "bg-muted"
+                                    ? "bg-secondary text-secondary-foreground"
+                                    : "bg-muted"
                                     }`}
                             >
                                 {msg.text}

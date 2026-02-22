@@ -16,23 +16,23 @@ const InvestmentValue = () => {
         </div>
         <div className="rounded-3xl border border-border bg-card p-6 shadow-lg space-y-6">
           <div>
-            <p className="text-sm uppercase text-muted-foreground tracking-widest">Ценность для страны</p>
-            <p className="text-2xl font-semibold">Экономия воды 40% • Урожайность +20–35%</p>
+            <p className="text-sm uppercase text-muted-foreground tracking-widest">Целевые показатели</p>
+            <p className="text-2xl font-semibold">Экономия воды до 40% • Рост урожайности</p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="rounded-2xl border border-border p-4">
               <p className="text-sm text-muted-foreground">Доход сельских семей</p>
-              <p className="text-3xl font-bold text-primary">+$ млн</p>
-              <p className="text-xs text-muted-foreground">тысячи домохозяйств выходят в плюс</p>
+              <p className="text-3xl font-bold text-primary">Рост</p>
+              <p className="text-xs text-muted-foreground">повышение прибыльности хозяйств</p>
             </div>
             <div className="rounded-2xl border border-border p-4">
               <p className="text-sm text-muted-foreground">Рабочие места</p>
-              <p className="text-3xl font-bold text-secondary">+ сотни</p>
-              <p className="text-xs text-muted-foreground">инженеры, агрономы, аналитики</p>
+              <p className="text-3xl font-bold text-secondary">+ вакансии</p>
+              <p className="text-xs text-muted-foreground">для инженеров и агрономов</p>
             </div>
           </div>
           <p className="text-muted-foreground">
-            «АгроПоле-242» становится прототипом для горных регионов Азии и мира, защищая продовольствие от климатических и энергетических ударов.
+            AgroFarm становится прототипом для горных регионов Азии и мира, защищая продовольствие от климатических и энергетических ударов.
           </p>
         </div>
       </div>
